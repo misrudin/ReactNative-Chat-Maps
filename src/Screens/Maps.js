@@ -1,61 +1,58 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
+
+const inittialState = {
+  latitude: null,
+  longitude: null,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
+};
 
 const Maps = () => {
-  const [markers, setMarkers] = useState([
-    {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      title: 'Udin',
-    },
-    {
-      latitude: 37.78625,
-      longitude: -122.4335,
-      title: 'Bapa',
-    },
-    {
-      latitude: 37.78628,
-      longitude: -122.4365,
-      title: 'Ema',
-    },
-    {
-      latitude: 37.78825,
-      longitude: -122.4335,
-      title: 'Adek',
-    },
-  ]);
+  const [currenPosition, setCurrentPosition] = useState(inittialState);
 
-  return (
-    <View>
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        region={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121,
-        }}>
-        {markers.map(marker => {
-          return (
-            <Marker
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              title={marker.title}
-            />
-          );
-        })}
-      </MapView>
-    </View>
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        // alert(JSON.stringify(position));
+        const {latitude, longitude} = position.coords;
+        setCurrentPosition({
+          ...currenPosition,
+          latitude,
+          longitude,
+        });
+      },
+      error => alert(error.message),
+      {timeout: 20000, maximumAge: 1000},
+    );
+  }, []);
+
+  return currenPosition.latitude ? (
+    <MapView
+      provider={PROVIDER_GOOGLE}
+      style={styles.map}
+      showsUserLocation
+      showsTraffic
+      showsCompass
+      initialRegion={currenPosition}>
+      <Marker coordinate={currenPosition}>
+        <Text>i</Text>
+      </Marker>
+    </MapView>
+  ) : (
+    <ActivityIndicator size="large" style={styles.loading} />
   );
 };
 
 const styles = StyleSheet.create({
   map: {
+    flex: 1,
     height: '100%',
+  },
+  loading: {
+    flex: 1,
   },
 });
 
