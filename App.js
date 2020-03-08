@@ -1,10 +1,12 @@
 import React from 'react';
-// import {View, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import MainNav from './src/Public/Navigators/MainNav';
-import {AuthProvider} from './src/Public/Context/auth';
 import {decode, encode} from 'base-64';
 import Header from './src/Components/Header';
+
+import {Provider} from 'react-redux';
+import store from './src/Public/redux/store';
+// console.disableYellowBox = true;
 
 const App = () => {
   if (!global.btoa) {
@@ -15,12 +17,12 @@ const App = () => {
     global.atob = decode;
   }
   return (
-    <AuthProvider>
+    <Provider store={store}>
       <NavigationContainer>
         <Header />
         <MainNav />
       </NavigationContainer>
-    </AuthProvider>
+    </Provider>
   );
 };
 

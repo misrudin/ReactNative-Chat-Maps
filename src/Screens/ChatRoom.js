@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     flex: 1,
     marginRight: 5,
+    fontFamily: 'roboto',
   },
   container: {
     flex: 1,

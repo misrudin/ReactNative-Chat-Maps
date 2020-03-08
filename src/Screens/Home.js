@@ -6,22 +6,43 @@ import ChatList from '../Components/ChatList';
 
 const Home = props => {
   const [users, setUsers] = useState([]);
-  const name = 'udin';
+  const [friends, setFriends] = useState([]);
+  const email = 'misrudinz@gmail.com';
 
   const showRoom = () => {
     props.navigation.navigate('ChatRoom');
+  };
+
+  const fetchUser = () => {
+    friends.map(e => {
+      const db = app.firestore();
+      const unsubscribe = db
+        .collection('users')
+        .where('email', '==', e)
+        .onSnapshot(snapshot => {
+          const userData = [];
+          snapshot.forEach(doc => console.warn(doc.data()));
+          // userData.push({...doc.data()})
+          // setUsers(userData);
+          // console.warn(userData);
+        });
+      return unsubscribe;
+    });
   };
 
   useEffect(() => {
     const db = app.firestore();
     const unsubscribe = db
       .collection('users')
-      .where('name', '==', name)
+      .where('email', '==', email)
       .onSnapshot(snapshot => {
-        const userData = [];
-        snapshot.forEach(doc => userData.push({...doc.data()}));
-        setUsers(userData[0].friend);
+        const Friend = [];
+        snapshot.forEach(doc => Friend.push(...doc.data().friend));
+        // userData.push({...doc.data()})
+        setFriends(Friend);
+        // console.warn(friends);
       });
+    fetchUser();
     return unsubscribe;
   }, []);
   return (
