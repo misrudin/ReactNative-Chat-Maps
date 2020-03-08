@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "998942814222",
+    "firebase_url": "https://maps-chat-270311.firebaseio.com",
+    "project_id": "maps-chat-270311",
+    "storage_bucket": "maps-chat-270311.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998942814222:android:1cd23a83001d52df120c5f",
+        "android_client_info": {
+          "package_name": "com.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "998942814222-l8eta9bbtob0lb87jtt4719tsrbrrvhi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtTkyVKw38htD2OAUp06keLELfoL0crU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "998942814222-l8eta9bbtob0lb87jtt4719tsrbrrvhi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

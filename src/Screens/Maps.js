@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -37,9 +37,7 @@ const Maps = () => {
       showsTraffic
       showsCompass
       initialRegion={currenPosition}>
-      <Marker coordinate={currenPosition}>
-        <Text>i</Text>
-      </Marker>
+      <Marker coordinate={currenPosition} />
     </MapView>
   ) : (
     <ActivityIndicator size="large" style={styles.loading} />
@@ -53,6 +51,11 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
+  },
+  img: {
+    width: 30,
+    height: 30,
+    borderRadius: 50,
   },
 });
 
