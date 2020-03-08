@@ -59,4 +59,6 @@ buck-out/
 /ios/Pods/
 
 #config
-/src/config
+/src/config/
+Firebase.js
+env.js
