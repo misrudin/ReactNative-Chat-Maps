@@ -5,7 +5,8 @@ const initialValue = {
   isRejected: false,
   isFulfilled: false,
   datalogin: [],
-  token: '',
+  token: null,
+  loading: true,
 };
 
 const userReducer = (state = initialValue, action) => {
@@ -43,9 +44,10 @@ const userReducer = (state = initialValue, action) => {
         ...state,
         isPending: false,
         isRejected: true,
-        errMsg: action.payload.data,
+        errMsg: action.payload.data.msg,
       };
     case 'LOGIN_FULFILLED':
+      console.log('token', action.payload.data.token);
       return {
         ...state,
         isPending: false,
@@ -53,26 +55,10 @@ const userReducer = (state = initialValue, action) => {
         datalogin: action.payload.data,
         token: action.payload.data.token,
       };
-    case 'TOKEN_PENDING':
+    case 'TOKEN':
       return {
         ...state,
-        isPending: true,
-        isRejected: false,
-        isFulfilled: false,
-      };
-    case 'TOKEN_REJECTED':
-      return {
-        ...state,
-        isPending: false,
-        isRejected: true,
-        errMsg: action.payload.data,
-      };
-    case 'TOKEN_FULFILLED':
-      return {
-        ...state,
-        isPending: false,
-        isFulfilled: true,
-        datalogin: action.payload.data,
+        loading: false,
         token: action.payload,
       };
     case 'ID_PENDING':

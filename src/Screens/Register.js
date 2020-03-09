@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-const Register = () => {
+const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   // const auth = useContext(AuthContext);
@@ -37,6 +37,13 @@ const Register = () => {
       <TouchableOpacity style={styles.login}>
         <Text style={styles.txtLogin} onPress={() => handleSignUp()}>
           Register
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.login}>
+        <Text
+          style={styles.txtLogin}
+          onPress={() => navigation.navigate('Login')}>
+          Login
         </Text>
       </TouchableOpacity>
     </View>

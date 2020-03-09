@@ -7,6 +7,8 @@ import Maps from '../../Screens/Maps';
 import Login from '../../Screens/Login';
 import Register from '../../Screens/Register';
 import ChatRoom from '../../Screens/ChatRoom';
+import Splash from '../../Screens/Splash';
+import {useSelector} from 'react-redux';
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
@@ -21,28 +23,40 @@ const MainNav = () => {
 };
 
 const AuthNav = () => {
+  const {loading, token} = useSelector(state => state.user);
+
+  if (loading) {
+    return <Splash />;
+  }
   return (
-    <Stack.Navigator initialRouteName="Register">
-      <Stack.Screen
-        name="Register"
-        component={Register}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Home"
-        component={MainNav}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="ChatRoom"
-        component={ChatRoom}
-        options={{headerShown: false}}
-      />
+    <Stack.Navigator>
+      {token === null ? (
+        <>
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{headerShown: false}}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="Home"
+            component={MainNav}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ChatRoom"
+            component={ChatRoom}
+            options={{headerShown: false}}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 };

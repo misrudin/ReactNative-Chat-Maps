@@ -5,7 +5,7 @@ import {decode, encode} from 'base-64';
 import Header from './src/Components/Header';
 
 import {Provider} from 'react-redux';
-import store from './src/Public/redux/store';
+import store from './src/Public/Redux/store';
 // console.disableYellowBox = true;
 
 const App = () => {

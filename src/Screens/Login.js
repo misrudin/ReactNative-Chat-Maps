@@ -1,7 +1,6 @@
 import React, {useCallback, useContext, useState, useEffect} from 'react';
 import app from '../Config/Firebase';
 import 'firebase/firestore';
-// import AuthContext from '../Public/Context/auth';
 import {
   View,
   Text,
@@ -9,18 +8,37 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {login, savetoken} from '../Public/Redux/actions/user';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const Login = () => {
-  //   const auth = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const handleLogin = useCallback(async () => {
+const Login = ({navigation}) => {
+  const [email, setEmail] = useState('din@gmail.com');
+  const [password, setPassword] = useState('123');
+  const dispatch = useDispatch();
+  const {token, isPending} = useSelector(state => state.user);
+
+  const saveToken = async () => {
     try {
-      await app.auth().signInWithEmailAndPassword(email, password);
+      const gettoken = token;
+
+      console.warn(gettoken);
+      console.warn(token);
+      // await AsyncStorage.setItem('Token', token);
     } catch (error) {
-      console.log(error);
+      console.warn(error.msg);
     }
-  }, []);
+  };
+
+  const handleLogin = async () => {
+    const data = {
+      email,
+      password,
+    };
+    await dispatch(login(data)).then(() => {
+      saveToken();
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -30,6 +48,7 @@ const Login = () => {
         onChangeText={e => setEmail(e)}
         keyboardType={'email-address'}
         autoCapitalize="none"
+        value={email}
       />
       <TextInput
         placeholder="Password..."
@@ -37,9 +56,15 @@ const Login = () => {
         onChangeText={e => setPassword(e)}
         secureTextEntry
         autoCapitalize="none"
+        value={password}
       />
       <TouchableOpacity style={styles.login} onPress={() => handleLogin()}>
         <Text style={styles.txtLogin}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.login}
+        onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.txtLogin}>Register</Text>
       </TouchableOpacity>
     </View>
   );

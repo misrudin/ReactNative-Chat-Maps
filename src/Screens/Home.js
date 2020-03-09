@@ -37,7 +37,7 @@ const Home = props => {
       .where('email', '==', email)
       .onSnapshot(snapshot => {
         const Friend = [];
-        snapshot.forEach(doc => Friend.push(...doc.data().friend));
+        snapshot.forEach(doc => Friend.push(doc.data().friend));
         // userData.push({...doc.data()})
         setFriends(Friend);
         // console.warn(friends);
