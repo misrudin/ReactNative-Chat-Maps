@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useState, useEffect} from 'react';
-import app from '../Config/Firebase';
+import firebase from '../Config/Firebase';
 import 'firebase/firestore';
 import {
   View,
@@ -7,26 +7,87 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
+import md5 from 'md5';
 
 const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
   const [address, setAddress] = useState('');
   const [gender, setGender] = useState('');
+  const [name, setName] = useState('');
+  const [usersRef, setusersRef] = useState(firebase.database().ref('users'));
+
+  const humanEdan = () => {
+    if (email === '') {
+      Alert.alert('Email cannot be empty');
+      return false;
+    } else if (password === '') {
+      Alert.alert('Password cannot be empty');
+      return false;
+    } else if (address === '') {
+      Alert.alert('Fullname cannot be empty');
+      return false;
+    } else if (password !== password2) {
+      Alert.alert('Password is not same');
+      setPassword('');
+      setPassword2('');
+      return false;
+    } else {
+      return true;
+    }
+  };
 
   const handleSignUp = async () => {
-    const data = {email, password, address, gender};
-    // try {
-    //   await app.auth().createUserWithEmailAndPassword(email, password);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    navigation.navigate('AddProfile', {data: data});
+    if (humanEdan()) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(createdUser => {
+          createdUser.user
+            .updateProfile({
+              displayName: name,
+              photoURL: `http://gravatar.com/avatar/${md5(
+                createdUser.user.email,
+              )}?d=identicon`,
+            })
+            .then(() => {
+              saveUser(createdUser).then(() => {
+                Alert.alert('You succes Register');
+              });
+            });
+
+          navigation.navigate('Login');
+        })
+        .catch(function(error) {
+          Alert.alert(error.message);
+        });
+    }
+  };
+
+  const saveUser = createdUser => {
+    return usersRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      avatar: createdUser.user.photoURL,
+      status: 'none',
+      latitude: 0,
+      longitude: 0,
+      log: 'offline',
+    });
   };
 
   return (
     <View style={styles.container}>
+      <TextInput
+        placeholder="Profile name..."
+        style={styles.textInput}
+        onChangeText={e => setName(e)}
+        value={name}
+        autoCapitalize="none"
+      />
       <TextInput
         placeholder="Email..."
         style={styles.textInput}
@@ -39,6 +100,13 @@ const Register = ({navigation}) => {
         style={styles.textInput}
         onChangeText={e => setPassword(e)}
         value={password}
+        autoCapitalize="none"
+      />
+      <TextInput
+        placeholder="Password..."
+        style={styles.textInput}
+        onChangeText={e => setPassword2(e)}
+        value={password2}
         autoCapitalize="none"
       />
       <TextInput

@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import app from '../Config/Firebase';
+import firebase from '../Config/Firebase';
 import 'firebase/firestore';
 // import AuthContext from '../Public/Context/auth';
 import {
@@ -15,6 +15,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Text,
 } from 'react-native';
 import ItemChat from '../Components/ItemChat';
 
@@ -22,40 +23,72 @@ const ChatRoom = props => {
   const scrollViewRef = useRef();
   const [chat, setChat] = useState([]);
   const [newChat, setNewChat] = useState('');
+  const [fName, setfName] = useState('');
+  const [fuid, setfUid] = useState(props.route.params.uid);
+  const [avatar, setAvatar] = useState('');
+  const [uid, setUid] = useState(null);
 
   const sendMessage = () => {
     if (newChat.trim()) {
-      const newData = [];
-      newData.push(...chat, {
-        no: 1,
-        chat: newChat.trim(),
-      });
-      setChat(newData);
+      let msgId = firebase
+        .database()
+        .ref('message')
+        .child(uid)
+        .child(fuid)
+        .push().key;
+      let updates = {};
+      let message = {
+        message: newChat,
+        time: firebase.database.ServerValue.TIMESTAMP,
+        from: uid,
+      };
+      updates['messages/' + uid + '/' + fuid + '/' + msgId] = message;
+      updates['messages/' + fuid + '/' + uid + '/' + msgId] = message;
+      firebase
+        .database()
+        .ref()
+        .update(updates);
       setNewChat('');
     }
   };
 
   useEffect(() => {
-    const data = [
-      {
-        no: 1,
-        chat: 'halooo',
-      },
-      {
-        no: 2,
-        chat: 'Haiii',
-      },
-      {
-        no: 1,
-        chat: 'halooo',
-      },
-      {
-        no: 1,
-        chat: 'halooo',
-      },
-    ];
-    setChat(data);
+    var user = firebase.auth().currentUser;
+    if (user != null) {
+      setUid(user.uid);
+    }
+    const data = [];
+    firebase
+      .database()
+      .ref('messages')
+      .child(user.uid)
+      .child(fuid)
+      .on('child_added', value => {
+        data.push(value.val());
+        setChat(data);
+      });
   }, []);
+
+  const convertTime = time => {
+    let d = new Date(time);
+    let c = new Date();
+    let result = (d.getHours() < 10 ? '0' : '') + d.getHours() + ':';
+    result += (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+    if (c.getDay() !== d.getDay()) {
+      result = d.getDay() + ' ' + d.getMonth() + ' ' + result;
+    }
+    return result;
+  };
+
+  const RenderRow = ({item}) => {
+    return (
+      <View style={item.from === uid ? styles.chatr : styles.chatl}>
+        <Text style={styles.txtChat}>{item.message}</Text>
+        <Text style={styles.time}>{convertTime(item.time)}</Text>
+      </View>
+    );
+  };
+
   return (
     <>
       <View style={styles.container}>
@@ -66,7 +99,7 @@ const ChatRoom = props => {
             scrollViewRef.current.scrollToEnd({animated: true});
           }}>
           {chat.map((c, i) => {
-            return <ItemChat key={i} data={c} />;
+            return <RenderRow key={i} item={c} />;
           })}
         </ScrollView>
         <View style={styles.sendMessage}>
@@ -129,6 +162,45 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 5,
     paddingHorizontal: 20,
+  },
+  chatl: {
+    backgroundColor: '#363636',
+    maxWidth: '80%',
+    paddingHorizontal: 10,
+    paddingVertical: 0,
+    borderColor: '#f7f8fc',
+    borderWidth: 2,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    color: '#fff',
+    alignSelf: 'flex-start',
+    marginTop: 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  chatr: {
+    backgroundColor: '#00897b',
+    maxWidth: '80%',
+    paddingHorizontal: 10,
+    paddingVertical: 0,
+    borderColor: '#f7f8fc',
+    borderWidth: 2,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderTopLeftRadius: 10,
+    color: '#fff',
+    alignSelf: 'flex-end',
+    marginTop: 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  time: {color: '#eee', padding: 3, fontSize: 12, alignSelf: 'flex-end'},
+  txtChat: {
+    color: '#fff',
+    padding: 7,
+    fontSize: 16,
+    maxWidth: '95%',
   },
 });
 

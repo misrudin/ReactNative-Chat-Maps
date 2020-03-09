@@ -4,9 +4,7 @@ import {View, Text, StyleSheet} from 'react-native';
 const ItemChat = props => {
   return (
     <View>
-      <Text style={props.data.no === 2 ? styles.chatl : styles.chatr}>
-        {props.data.chat}
-      </Text>
+      <Text style={styles.chatl}>{props.data.message}</Text>
     </View>
   );
 };

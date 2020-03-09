@@ -48,6 +48,16 @@ const AuthNav = () => {
             component={AddProfile}
             options={{headerShown: false}}
           />
+          <Stack.Screen
+            name="Home"
+            component={MainNav}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ChatRoom"
+            component={ChatRoom}
+            options={{headerShown: false}}
+          />
         </>
       ) : (
         <>

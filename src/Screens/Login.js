@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useState, useEffect} from 'react';
-import app from '../Config/Firebase';
+import firebase from '../Config/Firebase';
 import 'firebase/firestore';
 import {
   View,
@@ -7,32 +7,32 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {login, savetoken} from '../Public/Redux/actions/user';
-import AsyncStorage from '@react-native-community/async-storage';
+// import {useDispatch, useSelector} from 'react-redux';
+// import {login, savetoken} from '../Public/Redux/actions/user';
+// import AsyncStorage from '@react-native-community/async-storage';
 
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState('din@gmail.com');
-  const [password, setPassword] = useState('123');
-  const dispatch = useDispatch();
-  const {token, isPending} = useSelector(state => state.user);
-
-  const saveToken = async () => {
-    try {
-      const gettoken = token;
-      // await AsyncStorage.setItem('Token', token);
-    } catch (error) {
-      console.warn(error.msg);
-    }
-  };
+  const [email, setEmail] = useState('udien@gmail.com');
+  const [password, setPassword] = useState('123456');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    const data = {
-      email,
-      password,
-    };
-    await dispatch(login(data)).then(() => {});
+    setLoading(true);
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(res => {
+        Alert.alert('You Succes Login');
+        setLoading(false);
+        navigation.navigate('Home');
+      })
+      .catch(function(error) {
+        setLoading(false);
+        Alert.alert(error.message);
+      });
   };
 
   return (
@@ -53,11 +53,17 @@ const Login = ({navigation}) => {
         autoCapitalize="none"
         value={password}
       />
-      <TouchableOpacity style={styles.login} onPress={() => handleLogin()}>
-        <Text style={styles.txtLogin}>Login</Text>
-      </TouchableOpacity>
+      {!loading ? (
+        <TouchableOpacity style={styles.login} onPress={() => handleLogin()}>
+          <Text style={styles.txtLogin}>Login</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.login} onPress={() => handleLogin()}>
+          <ActivityIndicator size="small" color="white" />
+        </TouchableOpacity>
+      )}
       <TouchableOpacity
-        style={styles.login}
+        style={styles.register}
         onPress={() => navigation.navigate('Register')}>
         <Text style={styles.txtLogin}>Register</Text>
       </TouchableOpacity>
@@ -83,18 +89,17 @@ const styles = StyleSheet.create({
   },
   login: {
     justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    alignSelf: 'center',
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    backgroundColor: '#33df89',
+    marginTop: 30,
   },
   txtLogin: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    borderRadius: 50,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
-    backgroundColor: '#33df89',
-    marginTop: 20,
   },
 });
 

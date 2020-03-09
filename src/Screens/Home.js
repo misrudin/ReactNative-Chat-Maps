@@ -1,43 +1,92 @@
 import React, {useCallback, useContext, useState, useEffect} from 'react';
-import app from '../Config/Firebase';
+import firebase from '../Config/Firebase';
 import 'firebase/firestore';
-import {View, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import ChatList from '../Components/ChatList';
+import Geolocation from '@react-native-community/geolocation';
 
 const Home = props => {
   const [users, setUsers] = useState([]);
-  const email = 'misrudinz@gmail.com';
-
-  const showRoom = () => {
-    props.navigation.navigate('ChatRoom');
-  };
+  const [uid, setUid] = useState(null);
+  const [keyid, setKeyId] = useState('');
+  const [isloading, setLoading] = useState(false);
 
   useEffect(() => {
-    const db = app.firestore();
-    const unsubscribe = db.collection('users').onSnapshot(snapshot => {
-      const userData = [];
-      snapshot.forEach(doc => userData.push({...doc.data()}));
-      setUsers(userData);
-    });
-    return unsubscribe;
+    const user = firebase.auth().currentUser;
+    if (user != null) {
+      setUid(user.uid);
+    }
+    Geolocation.getCurrentPosition(
+      position => {
+        firebase
+          .database()
+          .ref('users/' + user.uid)
+          .update({
+            longitude: position.coords.longitude,
+            latitude: position.coords.latitude,
+            log: 'online',
+          });
+      },
+      error => Alert.alert(error.message),
+      {timeout: 20000, maximumAge: 1000},
+    );
+    getmessage();
   }, []);
+
+  const getmessage = async () => {
+    const data = [];
+    await firebase
+      .database()
+      .ref('messages')
+      .child(uid)
+      .orderByChild('time')
+      .on('child_added', val => {
+        // console.log('val id', val.key);
+
+        let dbRef = firebase.database().ref('users/' + val.key);
+
+        dbRef.on('value', val => {
+          // console.log(val.val());
+          let person = val.val();
+          setLoading(false);
+          if (val.key !== uid) {
+            data.push(person);
+            setUsers(data);
+            setKeyId(val.key);
+            console.log(data);
+          }
+        });
+      });
+    setLoading(false);
+  };
+
+  const showRoom = () => {
+    props.navigation.navigate('ChatRoom', {uid: keyid});
+  };
+
   return (
     <>
       <View style={styles.container}>
-        {users ? (
-          <FlatList
-            data={users}
-            renderItem={({item}) => <ChatList data={item} onPress={showRoom} />}
-            keyExtractor={item => item.toString()}
-            showsVerticalScrollIndicator={false}
-          />
-        ) : (
+        {/* {isloading ? ( */}
+        <FlatList
+          data={users}
+          renderItem={({item}) => <ChatList data={item} onPress={showRoom} />}
+          keyExtractor={item => item.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+        {/* ) : (
           <ActivityIndicator
             size="large"
             color="#285bd4"
             style={styles.loading}
           />
-        )}
+        )} */}
       </View>
     </>
   );

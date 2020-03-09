@@ -20,17 +20,14 @@ const ChatList = props => {
       <TouchableOpacity activeOpacity={0.5} onPress={handlePres}>
         <View style={styles.content}>
           <View>
-            <Image
-              style={styles.avatar}
-              source={require('../Assets/img/20200111_210245.jpg')}
-            />
+            <Image style={styles.avatar} source={{uri: props.data.avatar}} />
           </View>
           <View style={styles.chat}>
             <View>
               <Text style={styles.name}>{props.data.name}</Text>
             </View>
             <View>
-              <Text style={styles.note}>Chat dari bakul cau ...</Text>
+              <Text style={styles.note}>{props.data.status}</Text>
             </View>
           </View>
         </View>
