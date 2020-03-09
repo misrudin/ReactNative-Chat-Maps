@@ -21,14 +21,14 @@ import ItemChat from '../Components/ItemChat';
 const ChatRoom = props => {
   const scrollViewRef = useRef();
   const [chat, setChat] = useState([]);
-  const [newChat, setNewChat] = useState([]);
+  const [newChat, setNewChat] = useState('');
 
   const sendMessage = () => {
-    if (newChat) {
+    if (newChat.trim()) {
       const newData = [];
       newData.push(...chat, {
         no: 1,
-        chat: newChat,
+        chat: newChat.trim(),
       });
       setChat(newData);
       setNewChat('');

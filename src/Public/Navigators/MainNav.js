@@ -7,6 +7,7 @@ import Maps from '../../Screens/Maps';
 import Login from '../../Screens/Login';
 import Register from '../../Screens/Register';
 import ChatRoom from '../../Screens/ChatRoom';
+import AddProfile from '../../Screens/AddProfile';
 import Splash from '../../Screens/Splash';
 import {useSelector} from 'react-redux';
 
@@ -40,6 +41,11 @@ const AuthNav = () => {
           <Stack.Screen
             name="Register"
             component={Register}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="AddProfile"
+            component={AddProfile}
             options={{headerShown: false}}
           />
         </>

@@ -17,10 +17,7 @@ const ChatList = props => {
   };
   return (
     <>
-      <TouchableOpacity
-        activeOpacity={0.5}
-        onPress={handlePres}
-        onLongPress={handleLongPress}>
+      <TouchableOpacity activeOpacity={0.5} onPress={handlePres}>
         <View style={styles.content}>
           <View>
             <Image
@@ -30,7 +27,7 @@ const ChatList = props => {
           </View>
           <View style={styles.chat}>
             <View>
-              <Text style={styles.name}>{props.data}</Text>
+              <Text style={styles.name}>{props.data.name}</Text>
             </View>
             <View>
               <Text style={styles.note}>Chat dari bakul cau ...</Text>

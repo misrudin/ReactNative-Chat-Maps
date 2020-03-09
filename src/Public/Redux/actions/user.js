@@ -6,7 +6,7 @@ const URL = Link();
 export const register = fd => {
   return {
     type: 'REGISTER',
-    payload: axios.post(URL + 'user/register', fd),
+    payload: axios.post(URL + 'user', fd),
   };
 };
 export const login = data => {

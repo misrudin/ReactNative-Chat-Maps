@@ -52,7 +52,6 @@ const userReducer = (state = initialValue, action) => {
         ...state,
         isPending: false,
         isFulfilled: true,
-        datalogin: action.payload.data,
         token: action.payload.data.token,
       };
     case 'TOKEN':

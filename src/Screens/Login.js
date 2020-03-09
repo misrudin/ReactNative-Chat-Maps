@@ -21,9 +21,6 @@ const Login = ({navigation}) => {
   const saveToken = async () => {
     try {
       const gettoken = token;
-
-      console.warn(gettoken);
-      console.warn(token);
       // await AsyncStorage.setItem('Token', token);
     } catch (error) {
       console.warn(error.msg);
@@ -35,9 +32,7 @@ const Login = ({navigation}) => {
       email,
       password,
     };
-    await dispatch(login(data)).then(() => {
-      saveToken();
-    });
+    await dispatch(login(data)).then(() => {});
   };
 
   return (

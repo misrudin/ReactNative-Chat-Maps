@@ -1,7 +1,6 @@
 import React, {useCallback, useContext, useState, useEffect} from 'react';
 import app from '../Config/Firebase';
 import 'firebase/firestore';
-// import AuthContext from '../Public/Context/auth';
 import {
   View,
   Text,
@@ -13,14 +12,18 @@ import {
 const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const auth = useContext(AuthContext);
-  const handleSignUp = useCallback(async () => {
-    try {
-      await app.auth().createUserWithEmailAndPassword(email, password);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  const [address, setAddress] = useState('');
+  const [gender, setGender] = useState('');
+
+  const handleSignUp = async () => {
+    const data = {email, password, address, gender};
+    // try {
+    //   await app.auth().createUserWithEmailAndPassword(email, password);
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    navigation.navigate('AddProfile', {data: data});
+  };
 
   return (
     <View style={styles.container}>
@@ -28,23 +31,35 @@ const Register = ({navigation}) => {
         placeholder="Email..."
         style={styles.textInput}
         onChangeText={e => setEmail(e)}
+        value={email}
+        autoCapitalize="none"
       />
       <TextInput
         placeholder="Password..."
         style={styles.textInput}
         onChangeText={e => setPassword(e)}
+        value={password}
+        autoCapitalize="none"
       />
-      <TouchableOpacity style={styles.login}>
-        <Text style={styles.txtLogin} onPress={() => handleSignUp()}>
-          Register
-        </Text>
+      <TextInput
+        placeholder="Address..."
+        style={styles.textInput}
+        onChangeText={e => setAddress(e)}
+        value={address}
+      />
+      <TextInput
+        placeholder="Gender..."
+        style={styles.textInput}
+        onChangeText={e => setGender(e)}
+        value={gender}
+      />
+      <TouchableOpacity style={styles.login} onPress={() => handleSignUp()}>
+        <Text style={styles.txtLogin}>Register</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.login}>
-        <Text
-          style={styles.txtLogin}
-          onPress={() => navigation.navigate('Login')}>
-          Login
-        </Text>
+      <TouchableOpacity
+        style={styles.login}
+        onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.txtLogin}>Login</Text>
       </TouchableOpacity>
     </View>
   );
