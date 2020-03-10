@@ -10,14 +10,19 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-// import {useDispatch, useSelector} from 'react-redux';
-// import {login, savetoken} from '../Public/Redux/actions/user';
-// import AsyncStorage from '@react-native-community/async-storage';
+import {useDispatch, useSelector} from 'react-redux';
+import {login, savetoken} from '../Public/Redux/actions/user';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('udien@gmail.com');
   const [password, setPassword] = useState('123456');
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const saveToken = async token => {
+    await dispatch(savetoken(token));
+  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -25,9 +30,10 @@ const Login = ({navigation}) => {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(res => {
-        Alert.alert('You Succes Login');
+        saveToken(res.user.uid);
         setLoading(false);
-        navigation.navigate('Home');
+        // navigation.navigate('Home');
+        // console.warn(res.user.uid);
       })
       .catch(function(error) {
         setLoading(false);

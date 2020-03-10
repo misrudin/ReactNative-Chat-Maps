@@ -29,7 +29,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Header />
+        {/* <Header /> */}
         <MainNav />
       </NavigationContainer>
     </Provider>

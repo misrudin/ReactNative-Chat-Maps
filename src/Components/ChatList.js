@@ -27,7 +27,7 @@ const ChatList = props => {
               <Text style={styles.name}>{props.data.name}</Text>
             </View>
             <View>
-              <Text style={styles.note}>{props.data.status}</Text>
+              <Text style={styles.note}>{props.data.log}</Text>
             </View>
           </View>
         </View>

@@ -18,15 +18,25 @@ import {
   Text,
 } from 'react-native';
 import ItemChat from '../Components/ItemChat';
+import Header from '../Components/Header';
+import AsyncStorage from '@react-native-community/async-storage';
+import {useDispatch, useSelector} from 'react-redux';
 
 const ChatRoom = props => {
+  const {loading, token} = useSelector(state => state.user);
   const scrollViewRef = useRef();
   const [chat, setChat] = useState([]);
   const [newChat, setNewChat] = useState('');
   const [fName, setfName] = useState('');
   const [fuid, setfUid] = useState(props.route.params.uid);
   const [avatar, setAvatar] = useState('');
-  const [uid, setUid] = useState(null);
+  const [uid, setUid] = useState(token);
+
+  // const getToken = async () => {
+  //   await AsyncStorage.getItem('Token', (err, token) => {
+  //     setUid(token);
+  //   });
+  // };
 
   const sendMessage = () => {
     if (newChat.trim()) {
@@ -53,15 +63,12 @@ const ChatRoom = props => {
   };
 
   useEffect(() => {
-    var user = firebase.auth().currentUser;
-    if (user != null) {
-      setUid(user.uid);
-    }
+    // getToken();
     const data = [];
     firebase
       .database()
       .ref('messages')
-      .child(user.uid)
+      .child(uid)
       .child(fuid)
       .on('child_added', value => {
         data.push(value.val());
@@ -91,6 +98,7 @@ const ChatRoom = props => {
 
   return (
     <>
+      <Header />
       <View style={styles.container}>
         <ScrollView
           style={styles.chatItem}
@@ -149,8 +157,8 @@ const styles = StyleSheet.create({
   btn: {
     backgroundColor: '#fff',
     justifyContent: 'center',
-    width: 40,
-    height: 40,
+    width: 45,
+    height: 45,
     alignSelf: 'center',
     alignItems: 'center',
     borderRadius: 100,
@@ -170,9 +178,9 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     borderColor: '#f7f8fc',
     borderWidth: 2,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 15,
+    // borderBottomRightRadius: 10,
+    borderTopRightRadius: 20,
     color: '#fff',
     alignSelf: 'flex-start',
     marginTop: 2,
@@ -186,9 +194,9 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     borderColor: '#f7f8fc',
     borderWidth: 2,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    borderTopLeftRadius: 10,
+    // borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 15,
+    borderTopLeftRadius: 20,
     color: '#fff',
     alignSelf: 'flex-end',
     marginTop: 2,

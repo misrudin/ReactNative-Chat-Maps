@@ -19,7 +19,9 @@ const Splash = () => {
   }, []);
   return (
     <View style={styles.container}>
-      <Text>Haiii</Text>
+      <Text style={styles.welcome}>Welcome</Text>
+      <Text style={styles.to}>To</Text>
+      <Text style={styles.haeu}>Haeu</Text>
     </View>
   );
 };
@@ -27,6 +29,23 @@ const Splash = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  welcome: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'salmon',
+    marginBottom: 10,
+  },
+  to: {
+    color: '#333',
+    marginBottom: 10,
+  },
+  haeu: {
+    color: 'green',
+    fontSize: 32,
+    fontWeight: 'bold',
   },
 });
 

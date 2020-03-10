@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  TextInput,
+} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -30,15 +37,20 @@ const Maps = () => {
   }, []);
 
   return currenPosition.latitude ? (
-    <MapView
-      provider={PROVIDER_GOOGLE}
-      style={styles.map}
-      showsUserLocation
-      showsTraffic
-      showsCompass
-      initialRegion={currenPosition}>
-      <Marker coordinate={currenPosition} />
-    </MapView>
+    <>
+      <View style={styles.contain}>
+        <TextInput placeholder="Ex : @haeuChat_" style={styles.textInput} />
+      </View>
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        showsUserLocation
+        showsTraffic
+        showsCompass
+        initialRegion={currenPosition}>
+        <Marker coordinate={currenPosition} />
+      </MapView>
+    </>
   ) : (
     <ActivityIndicator size="large" style={styles.loading} />
   );
@@ -56,6 +68,20 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 50,
+  },
+  textInput: {
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    fontFamily: 'roboto',
+  },
+  contain: {
+    backgroundColor: 'green',
+    paddingVertical: 5,
+    paddingHorizontal: 20,
   },
 });
 

@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import firebase from '../Config/Firebase';
 import {
   View,
   Text,
@@ -8,13 +9,36 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import {useDispatch} from 'react-redux';
-import {register} from '../Public/Redux/actions/user';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const AddProfile = ({route, navigation}) => {
+const MyProfile = ({route, navigation}) => {
   const [name, setName] = useState('');
   const [image, setImage] = useState(null);
-  const dispatch = useDispatch();
+  const [uid, setUid] = useState(null);
+  const [avatar, setAvatar] = useState(null);
+
+  useEffect(() => {
+    var user = firebase.auth().currentUser;
+    if (user != null) {
+      setUid(user.uid);
+    }
+
+    firebase
+      .database()
+      .ref('users')
+      .child(user.uid)
+      .on('value', val => {
+        // this.setState({
+        //   name: val.val().name,
+        //   telp: val.val().telp,
+        //   status: val.val().status,
+        //   avatar: val.val().avatar,
+        // });
+        setAvatar(val.val().avatar);
+        // console.warn(val.val().avatar);
+        setName(val.val().name);
+      });
+  }, []);
 
   const showImage = () => {
     const options = {
@@ -40,33 +64,12 @@ const AddProfile = ({route, navigation}) => {
     });
   };
 
-  const _register = async () => {
-    const {email, password, address, gender} = route.params.data;
-    let fd = new FormData();
-    fd.append('email', email);
-    fd.append('password', password);
-    fd.append('gender', gender);
-    fd.append('address', address);
-    fd.append('name', name);
-    fd.append('image', {
-      uri: image.uri,
-      name: image.fileName,
-      type: image.type,
-    });
-    await dispatch(register(fd)).then(dataUser => {
-      console.warn(dataUser.value.data.result);
-    });
-  };
   return (
     <View style={styles.container}>
-      <Text>{JSON.stringify(route.params.data)}</Text>
-      <View>
-        <TouchableOpacity onPress={showImage}>
-          <Image
-            source={image ? {uri: image.uri} : null}
-            style={styles.imgProfile}
-          />
-          <Text>Add Profile Photo</Text>
+      <View style={styles.boxProfile}>
+        <Image source={{uri: avatar}} style={styles.imgProfile} />
+        <TouchableOpacity onPress={showImage} style={styles.edit}>
+          <Icon name="edit" solid color="green" size={25} />
         </TouchableOpacity>
       </View>
       <View style={styles.containerInput}>
@@ -77,7 +80,7 @@ const AddProfile = ({route, navigation}) => {
           value={name}
         />
       </View>
-      <TouchableOpacity style={styles.btn} onPress={_register}>
+      <TouchableOpacity style={styles.btn}>
         <Text style={styles.btnText}>Next..</Text>
       </TouchableOpacity>
     </View>
@@ -121,6 +124,13 @@ const styles = StyleSheet.create({
   btn: {
     marginTop: 30,
   },
+  boxProfile: {
+    position: 'relative',
+  },
+  edit: {
+    top: -50,
+    left: 90,
+  },
 });
 
-export default AddProfile;
+export default MyProfile;

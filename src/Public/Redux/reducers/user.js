@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-community/async-storage';
 const initialValue = {
   dataUser: [],
   errMsg: [],
@@ -55,11 +56,20 @@ const userReducer = (state = initialValue, action) => {
         token: action.payload.data.token,
       };
     case 'TOKEN':
-      return {
-        ...state,
-        loading: false,
-        token: action.payload,
-      };
+      if (action.payload !== null) {
+        AsyncStorage.setItem('Token', action.payload);
+        return {
+          ...state,
+          loading: false,
+          token: action.payload,
+        };
+      } else {
+        return {
+          ...state,
+          loading: false,
+          token: null,
+        };
+      }
     case 'ID_PENDING':
       return {
         ...state,
