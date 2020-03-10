@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {login, savetoken} from '../Public/Redux/actions/user';
@@ -32,12 +33,11 @@ const Login = ({navigation}) => {
       .then(res => {
         saveToken(res.user.uid);
         setLoading(false);
-        // navigation.navigate('Home');
-        // console.warn(res.user.uid);
       })
       .catch(function(error) {
         setLoading(false);
-        Alert.alert(error.message);
+        // Alert.alert(error.message);
+        ToastAndroid.show(error.message, ToastAndroid.SHORT);
       });
   };
 
@@ -64,7 +64,7 @@ const Login = ({navigation}) => {
           <Text style={styles.txtLogin}>Login</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity style={styles.login} onPress={() => handleLogin()}>
+        <TouchableOpacity style={styles.login}>
           <ActivityIndicator size="small" color="white" />
         </TouchableOpacity>
       )}

@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import firebase from '../Config/Firebase';
+import 'firebase/firestore';
 import {
   View,
   Text,
@@ -6,13 +8,56 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  FlatList,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Header from '../Components/Header';
+import {useDispatch, useSelector} from 'react-redux';
 
 const Friend = ({navigation}) => {
+  const {token} = useSelector(state => state.user);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [key, setKey] = useState('');
   const [modal, setModal] = useState(false);
+
+  const getFriends = async () => {
+    const data = [];
+    setLoading(true);
+    let dbRef = firebase.database().ref('users');
+    await dbRef.on('child_added', val => {
+      let person = val.val();
+      person.uid = val.key;
+      setLoading(false);
+      if (person.uid !== token) {
+        data.push(person);
+        setUsers(data);
+      }
+    });
+  };
+
+  useEffect(() => {
+    setUsers([]);
+    getFriends();
+  }, []);
+
+  const showProfile = data => {
+    alert(data.name);
+  };
+
+  const UserList = ({data}) => {
+    return (
+      <TouchableOpacity onPress={() => showProfile(data)}>
+        <View style={styles.itemFriend}>
+          <Image source={{uri: data.avatar}} style={styles.avatar} />
+          <Text>{data.name}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <>
       <Header />
@@ -21,31 +66,10 @@ const Friend = ({navigation}) => {
           <TextInput placeholder="Ex : haeu chat" style={styles.textInput} />
         </View>
         <View style={styles.friend}>
-          <View style={styles.itemFriend}>
-            <Image style={styles.avatar} />
-            <Text>Friend</Text>
-          </View>
-          <View style={styles.itemFriend}>
-            <Image style={styles.avatar} />
-            <Text>Friend</Text>
-          </View>
-          <View style={styles.itemFriend}>
-            <Image style={styles.avatar} />
-            <Text>Friend</Text>
-          </View>
-          <View style={styles.itemFriend}>
-            <Image style={styles.avatar} />
-            <Text>Friend</Text>
-          </View>
-          <View style={styles.itemFriend}>
-            <Image style={styles.avatar} />
-            <Text>Friend</Text>
-          </View>
+          <Text>haoow</Text>
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.chatkuy}
-        onPress={() => navigation.navigate('Maps')}>
+      <TouchableOpacity style={styles.chatkuy} onPress={() => setModal(true)}>
         <Icon name="user-plus" color="#fff" size={25} />
       </TouchableOpacity>
 
@@ -74,6 +98,23 @@ const Friend = ({navigation}) => {
                   style={styles.iconSend}
                 />
               </TouchableOpacity>
+            </View>
+            <View>
+              {!loading ? (
+                <FlatList
+                  data={users}
+                  style={styles.data}
+                  renderItem={({item}) => <UserList data={item} />}
+                  keyExtractor={item => item.toString()}
+                  showsVerticalScrollIndicator={false}
+                />
+              ) : (
+                <ActivityIndicator
+                  size="large"
+                  color="#285bd4"
+                  style={styles.loading}
+                />
+              )}
             </View>
           </View>
         </>
@@ -145,12 +186,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderWidth: 1,
     borderColor: '#ddd',
+    padding: 10,
   },
   avatar: {
     width: 80,
     height: 80,
     backgroundColor: '#fff',
     borderRadius: 100,
+  },
+  data: {
+    marginBottom: 40,
+    marginTop: 10,
   },
 });
 

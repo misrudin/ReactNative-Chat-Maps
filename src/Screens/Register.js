@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import md5 from 'md5';
 
@@ -17,22 +18,27 @@ const Register = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [address, setAddress] = useState('');
-  const [gender, setGender] = useState('');
+  const [key, setKey] = useState('');
   const [name, setName] = useState('');
   const [usersRef, setusersRef] = useState(firebase.database().ref('users'));
+  const [friendRef, setfriendRef] = useState(firebase.database().ref('friend'));
+  const [loading, setLoading] = useState(false);
 
   const humanEdan = () => {
     if (email === '') {
-      Alert.alert('Email cannot be empty');
+      ToastAndroid.show('Email cannot be empty !', ToastAndroid.SHORT);
       return false;
     } else if (password === '') {
-      Alert.alert('Password cannot be empty');
+      ToastAndroid.show(
+        'Password cannot be empty and minimum 6 of character !',
+        ToastAndroid.SHORT,
+      );
       return false;
     } else if (address === '') {
-      Alert.alert('Fullname cannot be empty');
+      ToastAndroid.show('Complete the address !', ToastAndroid.SHORT);
       return false;
     } else if (password !== password2) {
-      Alert.alert('Password is not same');
+      ToastAndroid.show('Password not same !', ToastAndroid.SHORT);
       setPassword('');
       setPassword2('');
       return false;
@@ -43,6 +49,7 @@ const Register = ({navigation}) => {
 
   const handleSignUp = async () => {
     if (humanEdan()) {
+      setLoading(true);
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
@@ -55,15 +62,20 @@ const Register = ({navigation}) => {
               )}?d=identicon`,
             })
             .then(() => {
+              setLoading(false);
               saveUser(createdUser).then(() => {
-                Alert.alert('You succes Register');
+                ToastAndroid.show(
+                  'Register sucess, please Login !',
+                  ToastAndroid.SHORT,
+                );
               });
             });
 
           navigation.navigate('Login');
         })
         .catch(function(error) {
-          Alert.alert(error.message);
+          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+          setLoading(false);
         });
     }
   };
@@ -76,8 +88,20 @@ const Register = ({navigation}) => {
       latitude: 0,
       longitude: 0,
       log: 'offline',
+      key: key,
     });
   };
+
+  // const createFriend = createdUser => {
+  //   return friendRef.child(createdUser.user.uid).set({
+  //     name: createdUser.user.displayName,
+  //     avatar: createdUser.user.photoURL,
+  //     status: 'none',
+  //     latitude: 0,
+  //     longitude: 0,
+  //     log: 'offline',
+  //     key: key,
+  // };
 
   return (
     <View style={styles.container}>
@@ -94,6 +118,7 @@ const Register = ({navigation}) => {
         onChangeText={e => setEmail(e)}
         value={email}
         autoCapitalize="none"
+        keyboardType={'email-address'}
       />
       <TextInput
         placeholder="Password..."
@@ -101,6 +126,7 @@ const Register = ({navigation}) => {
         onChangeText={e => setPassword(e)}
         value={password}
         autoCapitalize="none"
+        secureTextEntry
       />
       <TextInput
         placeholder="Password..."
@@ -108,6 +134,7 @@ const Register = ({navigation}) => {
         onChangeText={e => setPassword2(e)}
         value={password2}
         autoCapitalize="none"
+        secureTextEntry
       />
       <TextInput
         placeholder="Address..."
@@ -116,14 +143,21 @@ const Register = ({navigation}) => {
         value={address}
       />
       <TextInput
-        placeholder="Gender..."
+        placeholder="@AIO_example"
         style={styles.textInput}
-        onChangeText={e => setGender(e)}
-        value={gender}
+        onChangeText={e => setKey(e)}
+        value={key}
       />
-      <TouchableOpacity style={styles.login} onPress={() => handleSignUp()}>
-        <Text style={styles.txtLogin}>Register</Text>
-      </TouchableOpacity>
+
+      {!loading ? (
+        <TouchableOpacity style={styles.login} onPress={() => handleSignUp()}>
+          <Text style={styles.txtLogin}>Register</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.login}>
+          <ActivityIndicator size="small" color="white" />
+        </TouchableOpacity>
+      )}
       <TouchableOpacity
         style={styles.login}
         onPress={() => navigation.navigate('Login')}>
@@ -151,18 +185,17 @@ const styles = StyleSheet.create({
   },
   login: {
     justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    alignSelf: 'center',
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    backgroundColor: '#33df89',
+    marginTop: 30,
   },
   txtLogin: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    borderRadius: 50,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
-    backgroundColor: '#33df89',
-    marginTop: 20,
   },
 });
 

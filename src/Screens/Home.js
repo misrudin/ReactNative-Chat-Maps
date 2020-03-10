@@ -12,29 +12,18 @@ import {
 } from 'react-native';
 import ChatList from '../Components/ChatList';
 import Geolocation from '@react-native-community/geolocation';
-import AsyncStorage from '@react-native-community/async-storage';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Header from '../Components/Header';
 
 const Home = props => {
-  const {loading, token} = useSelector(state => state.user);
+  const {token} = useSelector(state => state.user);
   const [users, setUsers] = useState([]);
   const [uid, setUid] = useState(token);
   const [keyid, setKeyId] = useState('');
   const [isloading, setLoading] = useState(true);
-  // const getToken = async () => {
-  //   await AsyncStorage.getItem('Token', (err, token) => {
-  //     setUid(token);
-  //   });
-  // };
 
   useEffect(() => {
-    // getToken();
-    // const user = firebase.auth().currentUser;
-    // if (user != null) {
-    //   setUid(user.uid);
-    // }
     Geolocation.getCurrentPosition(
       position => {
         firebase
@@ -61,17 +50,14 @@ const Home = props => {
       .child(uid)
       .orderByChild('time')
       .on('child_added', val => {
-        // console.log('val id', val.key);
         let dbRef = firebase.database().ref('users/' + val.key);
         dbRef.on('value', val => {
-          // console.log(val.val());
           let person = val.val();
           setLoading(false);
           if (val.key !== uid) {
             data.push(person);
             setUsers(data);
             setKeyId(val.key);
-            console.log(data);
           }
         });
       });

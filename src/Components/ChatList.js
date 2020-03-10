@@ -17,7 +17,10 @@ const ChatList = props => {
   };
   return (
     <>
-      <TouchableOpacity activeOpacity={0.5} onPress={handlePres}>
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={handlePres}
+        onLongPress={() => handleLongPress()}>
         <View style={styles.content}>
           <View>
             <Image style={styles.avatar} source={{uri: props.data.avatar}} />
