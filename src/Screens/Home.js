@@ -35,7 +35,7 @@ const Home = props => {
             log: 'online',
           });
       },
-      error => Alert.alert(error.message),
+      error => null,
       {timeout: 20000, maximumAge: 1000},
     );
 

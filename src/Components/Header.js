@@ -13,6 +13,7 @@ import ImagePicker from 'react-native-image-picker';
 import firebase from '../Config/Firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
+import {savetoken} from '../Public/Redux/actions/user';
 
 const Header = props => {
   const {loading, token} = useSelector(state => state.user);
@@ -21,9 +22,11 @@ const Header = props => {
   const [image, setImage] = useState(null);
   const [uid, setUid] = useState(token);
   const [avatar, setAvatar] = useState(null);
+  const dispatch = useDispatch();
 
   const _logout = () => {
     AsyncStorage.removeItem('Token');
+    dispatch(savetoken(null));
   };
 
   useEffect(() => {

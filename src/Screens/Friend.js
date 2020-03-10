@@ -11,17 +11,20 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Header from '../Components/Header';
+import {HeaderContact} from '../Components/Headers';
 import {useDispatch, useSelector} from 'react-redux';
 
 const Friend = ({navigation}) => {
   const {token} = useSelector(state => state.user);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [key, setKey] = useState('');
   const [modal, setModal] = useState(false);
+  const [friendRef, setfriendRef] = useState(firebase.database().ref('friend'));
 
   const getFriends = async () => {
     const data = [];
@@ -30,29 +33,129 @@ const Friend = ({navigation}) => {
     await dbRef.on('child_added', val => {
       let person = val.val();
       person.uid = val.key;
-      setLoading(false);
       if (person.uid !== token) {
         data.push(person);
-        setUsers(data);
+        fillter(data);
       }
     });
   };
 
   useEffect(() => {
     setUsers([]);
-    getFriends();
+    _getFriends();
   }, []);
 
-  const showProfile = data => {
-    alert(data.name);
+  const _addFriend = async data => {
+    // await firebase
+    //   .database()
+    //   .ref('friend')
+    //   .child(token)
+    //   .child(data.uid)
+    //   .on('child_added', value => {
+    //     let person = value.val();
+    //     if (person) {
+    //       console.warn('ada');
+    //     } else {
+    //       save(data);
+    //     }
+    //   });
+    save(data);
+  };
+
+  const save = async data => {
+    console.warn('send');
+    await firebase
+      .database()
+      .ref('users')
+      .on('child_added', val => {
+        let my = val.val();
+        my.uid = val.key;
+        if (my.uid === token) {
+          friendRef
+            .child(data.uid)
+            .child(token)
+            .set({
+              uid: token,
+              name: my.name,
+              avatar: my.avatar,
+              status: 1,
+            });
+        }
+      });
+    await friendRef
+      .child(token)
+      .child(data.uid)
+      .set({
+        uid: data.uid,
+        name: data.name,
+        avatar: data.avatar,
+        status: 0,
+      });
+  };
+  const fillter = data => {
+    let dataAfterFilter = data.filter(a => {
+      return a.key.toLowerCase().indexOf(key.toLowerCase()) !== -1;
+    });
+    setUsers(dataAfterFilter);
+    setLoading(false);
+    // console.warn(dataAfterFilter);
+  };
+
+  const _getFriends = async () => {
+    let dataFriends = [];
+    await firebase
+      .database()
+      .ref('friend')
+      .child(token)
+      .on('child_added', value => {
+        dataFriends.push(value.val());
+        setFriends(dataFriends);
+      });
   };
 
   const UserList = ({data}) => {
     return (
-      <TouchableOpacity onPress={() => showProfile(data)}>
+      <View style={styles.itemFriend}>
+        <Image source={{uri: data.avatar}} style={styles.avatar} />
+        <Text style={styles.name}>{data.name}</Text>
+        <TouchableOpacity onPress={() => _addFriend(data)} style={styles.addF}>
+          <Icon name="user-plus" size={20} color="green" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const gotochat = data => {
+    const uid = data.uid;
+    navigation.navigate('ChatRoom', {uid});
+    // console.warn(data);
+  };
+  const confirm = () => {
+    alert('oke');
+  };
+
+  const FriendList = ({data}) => {
+    return (
+      <TouchableOpacity
+        activeOpacity={data.status === 0 ? 1 : data.status === 1 ? 1 : 0.5}
+        onPress={data.status === 2 ? () => gotochat(data) : null}>
         <View style={styles.itemFriend}>
           <Image source={{uri: data.avatar}} style={styles.avatar} />
-          <Text>{data.name}</Text>
+          <Text style={styles.name}>{data.name}</Text>
+          <View style={styles.statusContainer}>
+            <Text style={styles.add}>
+              {data.status === 0
+                ? 'Waiting'
+                : data.status === 1
+                ? 'Request'
+                : 'Friend'}
+            </Text>
+            {data.status === 1 ? (
+              <TouchableOpacity onPress={() => confirm()}>
+                <Text style={styles.status}>Confirm</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -60,13 +163,15 @@ const Friend = ({navigation}) => {
 
   return (
     <>
-      <Header />
+      <HeaderContact />
       <View style={styles.container}>
         <View>
           <TextInput placeholder="Ex : haeu chat" style={styles.textInput} />
         </View>
         <View style={styles.friend}>
-          <Text>haoow</Text>
+          {friends.map((friend, index) => {
+            return <FriendList key={index} data={friend} />;
+          })}
         </View>
       </View>
       <TouchableOpacity style={styles.chatkuy} onPress={() => setModal(true)}>
@@ -82,14 +187,18 @@ const Friend = ({navigation}) => {
           setModal(false);
         }}>
         <>
-          <Header />
+          <HeaderContact />
           <View style={styles.container}>
             <View style={styles.sendMessage}>
               <TextInput
-                placeholder="Ex : @haeuChat_"
+                placeholder="Ex : misrudinz@gmail.com"
                 style={[styles.textInput, {flex: 1}]}
+                onChangeText={e => setKey(e)}
+                value={key}
+                keyboardType={'email-address'}
+                autoCapitalize="none"
               />
-              <TouchableOpacity style={styles.btn}>
+              <TouchableOpacity style={styles.btn} onPress={() => getFriends()}>
                 <Icon
                   name="search"
                   solid
@@ -101,13 +210,19 @@ const Friend = ({navigation}) => {
             </View>
             <View>
               {!loading ? (
-                <FlatList
-                  data={users}
-                  style={styles.data}
-                  renderItem={({item}) => <UserList data={item} />}
-                  keyExtractor={item => item.toString()}
-                  showsVerticalScrollIndicator={false}
-                />
+                users ? (
+                  <FlatList
+                    data={users}
+                    style={styles.data}
+                    renderItem={({item}) => <UserList data={item} />}
+                    keyExtractor={item => item.toString()}
+                    showsVerticalScrollIndicator={false}
+                  />
+                ) : (
+                  <View style={styles.data}>
+                    <Text>No Resutl</Text>
+                  </View>
+                )
               ) : (
                 <ActivityIndicator
                   size="large"
@@ -187,16 +302,46 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 10,
+    borderRadius: 5,
   },
   avatar: {
-    width: 80,
-    height: 80,
+    width: 50,
+    height: 50,
     backgroundColor: '#fff',
     borderRadius: 100,
   },
   data: {
     marginBottom: 40,
     marginTop: 10,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    alignSelf: 'center',
+  },
+  add: {
+    color: 'green',
+    marginRight: 10,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 0,
+    alignSelf: 'center',
+  },
+  status: {
+    color: 'orange',
+    marginRight: 10,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  addF: {
+    position: 'absolute',
+    right: 10,
+    alignSelf: 'center',
   },
 });
 

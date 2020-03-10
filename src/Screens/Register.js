@@ -21,7 +21,6 @@ const Register = ({navigation}) => {
   const [key, setKey] = useState('');
   const [name, setName] = useState('');
   const [usersRef, setusersRef] = useState(firebase.database().ref('users'));
-  const [friendRef, setfriendRef] = useState(firebase.database().ref('friend'));
   const [loading, setLoading] = useState(false);
 
   const humanEdan = () => {
@@ -84,6 +83,7 @@ const Register = ({navigation}) => {
     return usersRef.child(createdUser.user.uid).set({
       name: createdUser.user.displayName,
       avatar: createdUser.user.photoURL,
+      email: createdUser.user.email,
       status: 'none',
       latitude: 0,
       longitude: 0,
@@ -91,17 +91,6 @@ const Register = ({navigation}) => {
       key: key,
     });
   };
-
-  // const createFriend = createdUser => {
-  //   return friendRef.child(createdUser.user.uid).set({
-  //     name: createdUser.user.displayName,
-  //     avatar: createdUser.user.photoURL,
-  //     status: 'none',
-  //     latitude: 0,
-  //     longitude: 0,
-  //     log: 'offline',
-  //     key: key,
-  // };
 
   return (
     <View style={styles.container}>
