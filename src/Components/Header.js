@@ -47,6 +47,12 @@ const Header = props => {
   const logoutoke = () => {
     AsyncStorage.removeItem('Token');
     dispatch(savetoken(null));
+    firebase
+      .database()
+      .ref('users/' + token)
+      .update({
+        log: 'Offline',
+      });
   };
 
   useEffect(() => {
@@ -73,7 +79,7 @@ const Header = props => {
 
   const showImage = () => {
     const options = {
-      title: 'Add product image',
+      title: 'Add Profile image',
       mediaType: 'photo',
       maxWidth: 1024,
       maxHeight: 1024,
@@ -156,19 +162,33 @@ const Header = props => {
 
   return (
     <View style={styles.containerHeader}>
-      <Icon
-        name="comments"
-        solid
-        color="#fff"
-        size={25}
-        style={styles.iconSend}
-      />
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+        }}>
+        <Icon
+          name="comments"
+          solid
+          color="#fed6f6"
+          size={30}
+          style={styles.iconSend}
+        />
+        <Icon
+          name="comments"
+          solid
+          color="#ff971d"
+          size={25}
+          style={styles.iconSend2}
+        />
+      </View>
       <Text style={styles.title}>Hayuu</Text>
       <TouchableOpacity onPress={() => showModal()}>
         <Icon
           name="user"
           solid
-          color="#fff"
+          color="#ff971d"
           size={25}
           style={styles.iconSend}
         />
@@ -193,7 +213,7 @@ const Header = props => {
                 style={styles.imgProfile}
               />
               <TouchableOpacity onPress={showImage} style={styles.edit}>
-                <Icon name="edit" solid color="green" size={25} />
+                <Icon name="edit" solid color="#ff971d" size={25} />
               </TouchableOpacity>
             </View>
             <View style={styles.containerInput}>
@@ -203,12 +223,12 @@ const Header = props => {
                 onChangeText={e => setName(e)}
                 value={name}
               />
-              <Text style={styles.username}>{data.key}</Text>
-              <Text style={styles.username}>{email}</Text>
+              <Text style={styles.username}>Username : {data.key}</Text>
+              <Text style={styles.username}>Email : {email}</Text>
             </View>
             <View style={{flexDirection: 'row'}}>
               <TouchableOpacity
-                style={[styles.btn, {backgroundColor: 'green'}]}
+                style={[styles.btn, {backgroundColor: '#ff971d'}]}
                 onPress={() => _editProfile()}>
                 <Text style={styles.btnText}>Edit Profile</Text>
               </TouchableOpacity>
@@ -225,16 +245,23 @@ const Header = props => {
 
 const styles = StyleSheet.create({
   containerHeader: {
-    backgroundColor: '#00897b',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    shadowOffset: {width: 2, height: 4},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 8,
+    minHeight: 60,
   },
   title: {
-    color: '#fff',
+    color: '#ff971d',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
   },
   container: {
     backgroundColor: '#fff',
@@ -246,19 +273,20 @@ const styles = StyleSheet.create({
   imgProfile: {
     width: 200,
     height: 200,
-    backgroundColor: '#eee',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#ff971d',
+    borderWidth: 2,
+    borderColor: '#ffe8d6',
     borderRadius: 100,
   },
   textInput: {
-    borderBottomColor: 'green',
+    borderBottomColor: '#434e52',
     borderBottomWidth: 2,
     paddingHorizontal: 10,
     paddingTop: 5,
     paddingBottom: 1,
     fontSize: 20,
     marginTop: 20,
+    fontWeight: 'bold',
   },
   containerInput: {
     paddingHorizontal: 30,
@@ -271,7 +299,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginTop: 30,
-    backgroundColor: 'salmon',
+    backgroundColor: '#434e52',
     padding: 10,
     borderRadius: 10,
     marginLeft: 10,
@@ -288,7 +316,15 @@ const styles = StyleSheet.create({
   },
   username: {
     marginTop: 10,
-    color: 'green',
+    color: '#fff',
+    backgroundColor: '#434e52',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    fontWeight: 'bold',
+    borderRadius: 2,
+  },
+  iconSend2: {
+    position: 'absolute',
   },
 });
 export default Header;

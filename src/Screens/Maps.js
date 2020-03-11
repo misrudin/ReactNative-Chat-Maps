@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
-  TextInput,
+  TouchableOpacity,
   Modal,
   ToastAndroid,
 } from 'react-native';
@@ -43,6 +43,7 @@ const Maps = props => {
       error => ToastAndroid.show(error.message, ToastAndroid.SHORT),
       {enableHighAccuracy: false, timeout: 20000, maximumAge: 3600000},
     );
+    console.warn(props.route.params.data);
     return () => {
       Geolocation.clearWatch();
       Geolocation.stopObserving();
@@ -54,17 +55,55 @@ const Maps = props => {
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
+        showsMyLocationButton
+        showsTraffic
+        showsCompass
         region={friendPosition}>
         <Marker
-          pinColor="blue"
+          pinColor="#333366"
           coordinate={currenPosition}
           title={'Your Location'}
         />
-        <Marker pinColor="green" coordinate={friendPosition} />
+        <Marker
+          pinColor="#ff971d"
+          coordinate={friendPosition}
+          title={props.route.params.data.name}
+        />
       </MapView>
+      <View
+        style={{
+          position: 'absolute',
+          backgroundColor: '#fff',
+          width: '100%',
+          height: 230,
+          shadowOffset: {width: 2, height: 4},
+          shadowColor: '#000',
+          shadowRadius: 10,
+          shadowOpacity: 1,
+
+          elevation: 8,
+          bottom: 0,
+          paddingHorizontal: 30,
+          paddingVertical: 50,
+        }}>
+        <Text style={styles.name}>{props.route.params.data.name}</Text>
+        <Text style={styles.name}>{props.route.params.data.key}</Text>
+        <Text style={{position: 'absolute', right: 190, marginTop: 10}}>
+          {props.route.params.data.log}
+        </Text>
+        <Image
+          source={{uri: props.route.params.data.avatar}}
+          style={styles.avatar}
+        />
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() => props.navigation.navigate('ChatRoom')}>
+          <Text style={{color: '#fff', fontWeight: 'bold'}}>Back</Text>
+        </TouchableOpacity>
+      </View>
     </>
   ) : (
-    <ActivityIndicator size="large" style={styles.loading} />
+    <ActivityIndicator pinColor="#333366" size="large" style={styles.loading} />
   );
 };
 
@@ -94,6 +133,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     paddingVertical: 5,
     paddingHorizontal: 20,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    position: 'absolute',
+    top: -50,
+    right: 30,
+    borderRadius: 100,
+    borderWidth: 2,
+  },
+  name: {
+    marginTop: 10,
+    color: '#fff',
+    backgroundColor: '#434e52',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    fontWeight: 'bold',
+    borderRadius: 2,
+  },
+  btn: {
+    marginTop: 20,
+    backgroundColor: '#ff971d',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });
 

@@ -8,7 +8,7 @@ import Header from './src/Components/Header';
 
 import {Provider} from 'react-redux';
 import store from './src/Public/Redux/store';
-// console.disableYellowBox = true;
+console.disableYellowBox = true;
 
 // YellowBox.ignoreWarnings(['Setting a timer']);
 // const _console = _.clone(console);

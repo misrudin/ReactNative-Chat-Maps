@@ -45,7 +45,7 @@ const ChatList = props => {
 const styles = StyleSheet.create({
   name: {
     fontWeight: 'bold',
-    color: '#444',
+    color: '#1b262c',
     fontSize: 17,
   },
   avatar: {

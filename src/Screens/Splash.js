@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {savetoken} from '../Public/Redux/actions/user';
@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Splash = () => {
   const dispatch = useDispatch();
-
+  const [show, setShow] = useState(false);
   useEffect(() => {
     setTimeout(() => {
       const getToken = async () => {
@@ -16,18 +16,35 @@ const Splash = () => {
         });
       };
       getToken();
-    }, 1000);
+    }, 1500);
+    setTimeout(() => {
+      setShow(true);
+    }, 500);
   }, []);
   return (
     <View style={styles.container}>
-      <Icon
-        name="comments"
-        solid
-        color="green"
-        size={80}
-        style={styles.logoHayuu}
-      />
-      <Text style={styles.haeu}>Hayuu</Text>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+        }}>
+        <Icon
+          name="comments"
+          solid
+          color="#fed6f6"
+          size={90}
+          style={styles.logoHayuu2}
+        />
+        <Icon
+          name="comments"
+          solid
+          color="#ff971d"
+          size={80}
+          style={styles.logoHayuu}
+        />
+      </View>
+      {show ? <Text style={styles.haeu}>Hayuu</Text> : null}
     </View>
   );
 };
@@ -37,22 +54,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f9f6f7',
   },
   to: {
     color: '#333',
     marginBottom: 10,
   },
   haeu: {
-    color: 'green',
+    color: '#ff971d',
     fontSize: 40,
     fontWeight: 'bold',
   },
-  logoHayuu: {
-    shadowColor: '#333',
-    shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-    elevation: 5,
+  logoHayuu2: {
+    position: 'absolute',
   },
 });
 

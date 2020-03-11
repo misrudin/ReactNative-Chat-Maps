@@ -42,7 +42,7 @@ export const HeaderContact = props => {
           <Icon
             name="user"
             solid
-            color="#fff"
+            color="#ff971d"
             size={25}
             style={styles.iconSend}
           />
@@ -54,15 +54,21 @@ export const HeaderContact = props => {
 
 const styles = StyleSheet.create({
   containerHeader: {
-    backgroundColor: '#00897b',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    shadowOffset: {width: 2, height: 4},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 8,
+    minHeight: 60,
   },
   title: {
-    color: '#fff',
+    color: '#ff971d',
     fontWeight: 'bold',
     fontSize: 18,
   },
@@ -78,7 +84,7 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: '#eee',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: 'red',
     borderRadius: 100,
   },
   textInput: {
@@ -96,7 +102,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 18,
-    color: 'green',
+    color: '#ff971d',
     fontWeight: 'bold',
   },
   btn: {

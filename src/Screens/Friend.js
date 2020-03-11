@@ -42,59 +42,29 @@ const Friend = ({navigation}) => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      setUsers([]);
-      _getFriends();
-      // do something
-    });
-    return unsubscribe;
-  }, [navigation]);
+    _getFriends();
+  }, []);
 
   const _addFriend = async data => {
-    // await firebase
-    //   .database()
-    //   .ref('friend')
-    //   .child(token)
-    //   .child(data.uid)
-    //   .on('child_added', value => {
-    //     let person = value.val();
-    //     if (person) {
-    //       console.warn('ada');
-    //     } else {
-    //       save(data);
-    //     }
-    //   });
     save(data);
   };
 
   const save = async data => {
-    console.warn('send');
-    await firebase
+    let updates = {};
+    let person = {
+      status: 0,
+    };
+    let person2 = {
+      status: 1,
+    };
+    updates['friend/' + token + '/' + data.uid] = person;
+    updates['friend/' + data.uid + '/' + token] = person2;
+    firebase
       .database()
-      .ref('users')
-      .on('child_added', val => {
-        let my = val.val();
-        my.uid = val.key;
-        if (my.uid === token) {
-          friendRef
-            .child(data.uid)
-            .child(token)
-            .set({
-              uid: token,
-              name: my.name,
-              avatar: my.avatar,
-              status: 1,
-            });
-        }
-      });
-    await friendRef
-      .child(token)
-      .child(data.uid)
-      .set({
-        uid: data.uid,
-        name: data.name,
-        avatar: data.avatar,
-        status: 0,
+      .ref()
+      .update(updates)
+      .then(() => {
+        ToastAndroid.show('Send request', ToastAndroid.SHORT);
       });
   };
   const fillter = data => {
@@ -124,22 +94,14 @@ const Friend = ({navigation}) => {
           .ref('users')
           .child(person)
           .on('value', val => {
-            dataFriends.push(val.val());
+            let friendsme = val.val();
+            friendsme.status = value.val().status;
+            friendsme.uid = value.key;
+            dataFriends.push(friendsme);
             setFriends(dataFriends);
-            // console.warn(val.val());
           });
-        // _fillter(dataFriends);
       });
   };
-
-  // const _fillter = e => {
-  //   let dataAfterFilter = friends.filter(a => {
-  //     return a.name.toLowerCase().indexOf(e.toLowerCase()) !== -1;
-  //   });
-  //   setFriends(dataAfterFilter);
-  //   setLoading(false);
-  //   // console.warn(dataAfterFilter);
-  // };
 
   const UserList = ({data}) => {
     return (
@@ -147,7 +109,7 @@ const Friend = ({navigation}) => {
         <Image source={{uri: data.avatar}} style={styles.avatar} />
         <Text style={styles.name}>{data.name}</Text>
         <TouchableOpacity onPress={() => _addFriend(data)} style={styles.addF}>
-          <Icon name="user-plus" size={20} color="green" />
+          <Icon name="user-plus" size={20} color="#ff971d" />
         </TouchableOpacity>
       </View>
     );
@@ -208,15 +170,6 @@ const Friend = ({navigation}) => {
     <>
       <HeaderContact title={'Friend List'} />
       <View style={styles.container}>
-        {/* <View>
-          <TextInput
-            placeholder="Ex : hayu"
-            style={styles.textInput}
-            onChangeText={e => _fillter(e)}
-            // value={name}
-            // onSubmitEditing={() => _fillter()}
-          />
-        </View> */}
         <View style={styles.friend}>
           {friends.map((friend, index) => {
             return <FriendList key={index} data={friend} />;
@@ -243,6 +196,7 @@ const Friend = ({navigation}) => {
                 placeholder="Ex : misrudinz@gmail.com"
                 style={[styles.textInput, {flex: 1}]}
                 onChangeText={e => setKey(e)}
+                onSubmitEditing={() => getFriends()}
                 value={key}
                 keyboardType={'email-address'}
                 autoCapitalize="none"
@@ -251,7 +205,7 @@ const Friend = ({navigation}) => {
                 <Icon
                   name="search"
                   solid
-                  color="green"
+                  color="#ff971d"
                   size={15}
                   style={styles.iconSend}
                 />
@@ -275,7 +229,7 @@ const Friend = ({navigation}) => {
               ) : (
                 <ActivityIndicator
                   size="large"
-                  color="#285bd4"
+                  color="#ff971d"
                   style={styles.loading}
                 />
               )}
@@ -307,7 +261,7 @@ const styles = StyleSheet.create({
     right: 20,
     height: 60,
     width: 60,
-    backgroundColor: 'green',
+    backgroundColor: '#ff971d',
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
@@ -320,13 +274,20 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderRadius: 40,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 2,
+    borderColor: '#ffe8d6',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 5,
     marginRight: 5,
     fontFamily: 'roboto',
+
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   sendMessage: {
     flexDirection: 'row',
@@ -341,8 +302,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 100,
     padding: 10,
-    borderWidth: 1,
-    borderColor: 'green',
+    borderWidth: 2,
+    borderColor: '#ffe8d6',
+
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   friend: {
     marginTop: 10,
@@ -350,16 +318,14 @@ const styles = StyleSheet.create({
   itemFriend: {
     flexDirection: 'row',
     marginBottom: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
     padding: 10,
-    borderRadius: 5,
-    shadowOffset: {width: 0, height: 2},
-    shadowColor: '#f7f9fc',
-    shadowRadius: 1,
+    borderRadius: 1,
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#acacac',
+    shadowRadius: 3,
     shadowOpacity: 0.2,
 
-    elevation: 0.2,
+    elevation: 1,
   },
   avatar: {
     width: 50,
@@ -375,10 +341,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,
+    color: '#1b262c',
     alignSelf: 'center',
   },
   add: {
-    color: 'green',
+    color: '#ed8240',
     marginRight: 10,
   },
   statusContainer: {

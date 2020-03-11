@@ -32,7 +32,7 @@ const Home = props => {
           .update({
             longitude: position.coords.longitude,
             latitude: position.coords.latitude,
-            log: 'online',
+            log: 'Online',
           });
       },
       error => null,
@@ -64,7 +64,7 @@ const Home = props => {
             data.push(person);
             setUsers(data);
             // setKeyId(snap.key);
-            console.warn(val.val());
+            // console.warn(val.val());
           }
         });
       });
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     right: 20,
     height: 60,
     width: 60,
-    backgroundColor: 'green',
+    backgroundColor: '#ff971d',
     borderRadius: 30,
     shadowOffset: {width: 5, height: 5},
     shadowColor: '#000',

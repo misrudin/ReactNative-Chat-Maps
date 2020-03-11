@@ -72,7 +72,7 @@ const ChatRoom = ({route, navigation}) => {
       .child(uid)
       .child(fuid)
       .on('child_added', val => {
-        data.push(...chat, val.val());
+        data.push(val.val());
         setChat(data);
       });
   };
@@ -142,7 +142,7 @@ const ChatRoom = ({route, navigation}) => {
             <Icon
               name="paper-plane"
               solid
-              color="green"
+              color="#ff971d"
               size={20}
               style={styles.iconSend}
             />
@@ -156,14 +156,21 @@ const ChatRoom = ({route, navigation}) => {
 const styles = StyleSheet.create({
   textInput: {
     borderRadius: 40,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 2,
+    borderColor: '#ffe8d6',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 0,
     flex: 1,
     marginRight: 5,
     fontFamily: 'roboto',
+
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   container: {
     flex: 1,
@@ -183,45 +190,68 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 100,
     padding: 10,
-    borderWidth: 1,
-    borderColor: 'green',
+    borderWidth: 2,
+    borderColor: '#ffe8d6',
+
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   chatItem: {
     flex: 1,
     marginBottom: 5,
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   chatl: {
-    backgroundColor: '#363636',
+    backgroundColor: '#434e52',
     maxWidth: '85%',
     paddingHorizontal: 10,
     paddingVertical: 0,
-    borderColor: '#f7f8fc',
-    borderWidth: 2,
+    // borderColor: '#f7f8fc',
+    // borderWidth: 2,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 5,
     borderTopRightRadius: 20,
     color: '#fff',
     alignSelf: 'flex-start',
     marginTop: 2,
+    marginBottom: 2,
     flexDirection: 'row',
     justifyContent: 'center',
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   chatr: {
-    backgroundColor: '#00897b',
+    backgroundColor: '#ed8240',
     maxWidth: '85%',
     paddingHorizontal: 10,
     paddingVertical: 0,
-    borderColor: '#f7f8fc',
-    borderWidth: 2,
+    // borderColor: '#f7f8fc',
+    // borderWidth: 2,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 15,
     borderTopLeftRadius: 20,
     color: '#fff',
     alignSelf: 'flex-end',
     marginTop: 2,
+    marginBottom: 2,
     flexDirection: 'row',
     justifyContent: 'center',
+
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 2,
   },
   time: {color: '#eee', padding: 3, fontSize: 12, alignSelf: 'flex-end'},
   txtChat: {
