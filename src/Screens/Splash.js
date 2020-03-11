@@ -3,6 +3,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {savetoken} from '../Public/Redux/actions/user';
 import AsyncStorage from '@react-native-community/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Splash = () => {
   const dispatch = useDispatch();
@@ -19,9 +20,14 @@ const Splash = () => {
   }, []);
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome</Text>
-      <Text style={styles.to}>To</Text>
-      <Text style={styles.haeu}>Haeu</Text>
+      <Icon
+        name="comments"
+        solid
+        color="green"
+        size={80}
+        style={styles.logoHayuu}
+      />
+      <Text style={styles.haeu}>Hayuu</Text>
     </View>
   );
 };
@@ -32,20 +38,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  welcome: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'salmon',
-    marginBottom: 10,
-  },
   to: {
     color: '#333',
     marginBottom: 10,
   },
   haeu: {
     color: 'green',
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: 'bold',
+  },
+  logoHayuu: {
+    shadowColor: '#333',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+    elevation: 5,
   },
 });
 

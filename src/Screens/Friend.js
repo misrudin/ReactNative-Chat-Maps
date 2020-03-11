@@ -23,6 +23,7 @@ const Friend = ({navigation}) => {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
   const [key, setKey] = useState('');
+  const [name, setName] = useState('');
   const [modal, setModal] = useState(false);
   const [friendRef, setfriendRef] = useState(firebase.database().ref('friend'));
 
@@ -41,9 +42,13 @@ const Friend = ({navigation}) => {
   };
 
   useEffect(() => {
-    setUsers([]);
-    _getFriends();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      setUsers([]);
+      _getFriends();
+      // do something
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const _addFriend = async data => {
     // await firebase
@@ -93,11 +98,16 @@ const Friend = ({navigation}) => {
       });
   };
   const fillter = data => {
-    let dataAfterFilter = data.filter(a => {
-      return a.key.toLowerCase().indexOf(key.toLowerCase()) !== -1;
-    });
-    setUsers(dataAfterFilter);
-    setLoading(false);
+    if (key) {
+      let dataAfterFilter = data.filter(a => {
+        return a.key.toLowerCase().indexOf(key.toLowerCase()) !== -1;
+      });
+      setUsers(dataAfterFilter);
+      setLoading(false);
+    } else {
+      setUsers([]);
+      setLoading(false);
+    }
     // console.warn(dataAfterFilter);
   };
 
@@ -108,10 +118,28 @@ const Friend = ({navigation}) => {
       .ref('friend')
       .child(token)
       .on('child_added', value => {
-        dataFriends.push(value.val());
-        setFriends(dataFriends);
+        let person = value.key;
+        firebase
+          .database()
+          .ref('users')
+          .child(person)
+          .on('value', val => {
+            dataFriends.push(val.val());
+            setFriends(dataFriends);
+            // console.warn(val.val());
+          });
+        // _fillter(dataFriends);
       });
   };
+
+  // const _fillter = e => {
+  //   let dataAfterFilter = friends.filter(a => {
+  //     return a.name.toLowerCase().indexOf(e.toLowerCase()) !== -1;
+  //   });
+  //   setFriends(dataAfterFilter);
+  //   setLoading(false);
+  //   // console.warn(dataAfterFilter);
+  // };
 
   const UserList = ({data}) => {
     return (
@@ -126,8 +154,8 @@ const Friend = ({navigation}) => {
   };
 
   const gotochat = data => {
-    const uid = data.uid;
-    navigation.navigate('ChatRoom', {uid});
+    // const uid = data.uid;
+    navigation.navigate('ChatRoom', {data});
     // console.warn(data);
   };
   const confirm = data => {
@@ -146,6 +174,7 @@ const Friend = ({navigation}) => {
       .update({
         status: 2,
       });
+    _getFriends();
   };
 
   const FriendList = ({data}) => {
@@ -177,11 +206,17 @@ const Friend = ({navigation}) => {
 
   return (
     <>
-      <HeaderContact />
+      <HeaderContact title={'Friend List'} />
       <View style={styles.container}>
-        <View>
-          <TextInput placeholder="Ex : haeu chat" style={styles.textInput} />
-        </View>
+        {/* <View>
+          <TextInput
+            placeholder="Ex : hayu"
+            style={styles.textInput}
+            onChangeText={e => _fillter(e)}
+            // value={name}
+            // onSubmitEditing={() => _fillter()}
+          />
+        </View> */}
         <View style={styles.friend}>
           {friends.map((friend, index) => {
             return <FriendList key={index} data={friend} />;
@@ -201,7 +236,7 @@ const Friend = ({navigation}) => {
           setModal(false);
         }}>
         <>
-          <HeaderContact />
+          <HeaderContact title={'Get Friend'} />
           <View style={styles.container}>
             <View style={styles.sendMessage}>
               <TextInput
@@ -274,12 +309,14 @@ const styles = StyleSheet.create({
     width: 60,
     backgroundColor: 'green',
     borderRadius: 30,
-    shadowOffset: {width: 2, height: 2},
-    shadowColor: '#000',
-    shadowRadius: 2,
-    shadowOpacity: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowOffset: {width: 5, height: 5},
+    shadowColor: '#000',
+    shadowRadius: 10,
+    shadowOpacity: 1,
+
+    elevation: 4,
   },
   textInput: {
     borderRadius: 40,
@@ -317,6 +354,12 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     padding: 10,
     borderRadius: 5,
+    shadowOffset: {width: 0, height: 2},
+    shadowColor: '#f7f9fc',
+    shadowRadius: 1,
+    shadowOpacity: 0.2,
+
+    elevation: 0.2,
   },
   avatar: {
     width: 50,

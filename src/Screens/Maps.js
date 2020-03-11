@@ -8,30 +8,31 @@ import {
   ActivityIndicator,
   Image,
   TextInput,
+  Modal,
+  ToastAndroid,
 } from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import {useDispatch, useSelector} from 'react-redux';
 
-const inittialState = {
-  latitude: null,
-  longitude: null,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
-};
-
-const Maps = () => {
+const Maps = props => {
+  const inittialState = {
+    latitude: props.route.params.data.latitude,
+    longitude: props.route.params.data.longitude,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
   const {token} = useSelector(state => state.user);
   const [users, setUsers] = useState([]);
   const [uid, setUid] = useState(token);
   const [currenPosition, setCurrentPosition] = useState(inittialState);
+  const [friendPosition, setFriendPosition] = useState(inittialState);
   const [loading, setLoading] = useState(true);
   const [markers, setMarkers] = useState([]);
-
+  // console.warn(props.route.params.data);
   useEffect(() => {
-    const getlocation = Geolocation.getCurrentPosition(
+    const usnSubcribe = Geolocation.getCurrentPosition(
       position => {
-        // alert(JSON.stringify(position));
         const {latitude, longitude} = position.coords;
         setCurrentPosition({
           ...currenPosition,
@@ -39,62 +40,27 @@ const Maps = () => {
           longitude,
         });
       },
-      error => alert(error.message),
-      {timeout: 20000, maximumAge: 1000},
+      error => ToastAndroid.show(error.message, ToastAndroid.SHORT),
+      {enableHighAccuracy: false, timeout: 20000, maximumAge: 3600000},
     );
-    getFriends();
-    const dataarray = [];
-    if (currenPosition.latitude) {
-      users.map(us => {
-        // console.warn(us.latitude);
-        if (us.latitude !== 0) {
-          dataarray.push({latitude: us.latitude, longitude: us.longitude});
-          setMarkers(dataarray);
-        }
-      });
-      // console.warn(dataarray);
-    }
+    return () => {
+      Geolocation.clearWatch();
+      Geolocation.stopObserving();
+    };
   }, []);
 
-  const getFriends = async () => {
-    const data = [];
-    setLoading(true);
-    let dbRef = firebase.database().ref('users');
-    await dbRef.on('child_changed', val => {
-      let person = val.val();
-      person.uid = val.key;
-      setLoading(false);
-      if (person.uid !== token) {
-        data.push(person);
-        setUsers(data);
-      }
-    });
-  };
   return currenPosition.latitude ? (
     <>
-      <View style={styles.contain}>
-        <TextInput placeholder="Ex : @haeuChat_" style={styles.textInput} />
-      </View>
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        showsUserLocation
-        showsTraffic
-        showsCompass
-        initialRegion={currenPosition}>
-        {markers.map((marker, i) => {
-          console.warn(marker);
-          return (
-            <Marker
-              key={i}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-            />
-          );
-          // <Marker coordinate={currenPosition} />;
-        })}
+        region={friendPosition}>
+        <Marker
+          pinColor="blue"
+          coordinate={currenPosition}
+          title={'Your Location'}
+        />
+        <Marker pinColor="green" coordinate={friendPosition} />
       </MapView>
     </>
   ) : (

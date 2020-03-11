@@ -16,6 +16,7 @@ const MyProfile = ({route, navigation}) => {
   const [image, setImage] = useState(null);
   const [uid, setUid] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     var user = firebase.auth().currentUser;
@@ -28,15 +29,9 @@ const MyProfile = ({route, navigation}) => {
       .ref('users')
       .child(user.uid)
       .on('value', val => {
-        // this.setState({
-        //   name: val.val().name,
-        //   telp: val.val().telp,
-        //   status: val.val().status,
-        //   avatar: val.val().avatar,
-        // });
         setAvatar(val.val().avatar);
-        // console.warn(val.val().avatar);
         setName(val.val().name);
+        setData(val.val());
       });
   }, []);
 
@@ -80,6 +75,7 @@ const MyProfile = ({route, navigation}) => {
           value={name}
         />
       </View>
+      <Text>{data.key}j</Text>
       <TouchableOpacity style={styles.btn}>
         <Text style={styles.btnText}>Next..</Text>
       </TouchableOpacity>

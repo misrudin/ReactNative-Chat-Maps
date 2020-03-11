@@ -11,24 +11,26 @@ import 'firebase/firestore';
 // import AuthContext from '../Public/Context/auth';
 import {
   View,
-  ScrollView,
+  FlatList,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   Text,
+  Dimensions,
+  ScrollView,
 } from 'react-native';
 import ItemChat from '../Components/ItemChat';
-import Header from '../Components/Header';
+import {HeaderContact} from '../Components/Headers';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 
-const ChatRoom = props => {
+const ChatRoom = ({route, navigation}) => {
   const {loading, token} = useSelector(state => state.user);
   const scrollViewRef = useRef();
   const [chat, setChat] = useState([]);
   const [newChat, setNewChat] = useState('');
   const [fName, setfName] = useState('');
-  const [fuid, setfUid] = useState(props.route.params.uid);
+  const [fuid, setfUid] = useState(route.params.data.uid);
   const [avatar, setAvatar] = useState('');
   const [uid, setUid] = useState(token);
 
@@ -62,18 +64,25 @@ const ChatRoom = props => {
     }
   };
 
-  useEffect(() => {
-    // getToken();
+  const getmsg = async () => {
     const data = [];
-    firebase
+    await firebase
       .database()
       .ref('messages')
       .child(uid)
       .child(fuid)
-      .on('child_added', value => {
-        data.push(value.val());
+      .on('child_added', val => {
+        data.push(...chat, val.val());
         setChat(data);
       });
+  };
+
+  useEffect(() => {
+    getmsg();
+    // const unsubscribe = navigation.addListener('focus', () => {
+    //   // do something
+    // });
+    // return unsubscribe;
   }, []);
 
   const convertTime = time => {
@@ -96,9 +105,20 @@ const ChatRoom = props => {
     );
   };
 
+  let {height, width} = Dimensions.get('window');
+  const loadprofile = data => {
+    // alert(uid);
+    navigation.navigate('Maps', {data});
+  };
+
   return (
     <>
-      <Header />
+      <HeaderContact
+        title={route.params.data.name}
+        avatar={route.params.data.avatar}
+        data={route.params.data}
+        profile={loadprofile}
+      />
       <View style={styles.container}>
         <ScrollView
           style={styles.chatItem}

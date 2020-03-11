@@ -36,10 +36,15 @@ const Home = props => {
           });
       },
       error => null,
-      {timeout: 20000, maximumAge: 1000},
+      {enableHighAccuracy: false, timeout: 20000, maximumAge: 3600000},
     );
 
     getmessage();
+
+    return () => {
+      Geolocation.clearWatch();
+      Geolocation.stopObserving();
+    };
   }, []);
 
   const getmessage = async () => {
@@ -51,14 +56,15 @@ const Home = props => {
       .orderByChild('time')
       .on('child_added', val => {
         let dbRef = firebase.database().ref('users/' + val.key);
-        dbRef.on('value', val => {
-          let person = val.val();
-          person.uid = val.key;
+        dbRef.on('value', snap => {
+          let person = snap.val();
+          person.uid = snap.key;
           setLoading(false);
-          if (val.key !== uid) {
+          if (person.uid !== uid) {
             data.push(person);
             setUsers(data);
-            setKeyId(val.key);
+            // setKeyId(snap.key);
+            console.warn(val.val());
           }
         });
       });
@@ -66,7 +72,7 @@ const Home = props => {
   };
 
   const showRoom = data => {
-    props.navigation.navigate('ChatRoom', {uid: data.uid});
+    props.navigation.navigate('ChatRoom', {data});
     // console.warn(data);
   };
 
@@ -120,12 +126,14 @@ const styles = StyleSheet.create({
     width: 60,
     backgroundColor: 'green',
     borderRadius: 30,
-    shadowOffset: {width: 2, height: 2},
+    shadowOffset: {width: 5, height: 5},
     shadowColor: '#000',
-    shadowRadius: 2,
+    shadowRadius: 10,
     shadowOpacity: 1,
     justifyContent: 'center',
     alignItems: 'center',
+
+    elevation: 4,
   },
 });
 export default Home;

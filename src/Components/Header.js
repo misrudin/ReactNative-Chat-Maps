@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import firebase from '../Config/Firebase';
+import 'firebase/firestore';
 import {
   View,
   Text,
@@ -7,13 +9,14 @@ import {
   Modal,
   Image,
   TextInput,
+  Alert,
+  ToastAndroid,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ImagePicker from 'react-native-image-picker';
-import firebase from '../Config/Firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
-import {savetoken} from '../Public/Redux/actions/user';
+import {savetoken, register} from '../Public/Redux/actions/user';
 
 const Header = props => {
   const {loading, token} = useSelector(state => state.user);
@@ -22,39 +25,51 @@ const Header = props => {
   const [image, setImage] = useState(null);
   const [uid, setUid] = useState(token);
   const [avatar, setAvatar] = useState(null);
+  const [data, setData] = useState([]);
+  const [email, setEmail] = useState();
   const dispatch = useDispatch();
 
   const _logout = () => {
+    Alert.alert(
+      'Confirm Logout',
+      'Do you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'Yes', onPress: () => logoutoke()},
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const logoutoke = () => {
     AsyncStorage.removeItem('Token');
     dispatch(savetoken(null));
   };
 
   useEffect(() => {
-    // const getToken = async () => {
-    //   await AsyncStorage.getItem('Token', (err, token) => {
-    //     console.warn(token);
-    //     setUid(token);
-    //   });
-    // };
-    // getToken();
+    getProfile();
+  }, []);
 
+  const getProfile = () => {
+    let curr = firebase.auth().currentUser;
+    if (curr != null) {
+      setEmail(curr.email);
+    }
     setTimeout(() => {
       firebase
         .database()
         .ref('users')
         .child(uid)
         .on('value', val => {
-          // this.setState({
-          //   name: val.val().name,
-          //   telp: val.val().telp,
-          //   status: val.val().status,
-          //   avatar: val.val().avatar,
-          // });
           setAvatar(val.val().avatar);
           setName(val.val().name);
+          setData(val.val());
         });
     }, 10);
-  }, []);
+  };
 
   const showImage = () => {
     const options = {
@@ -80,6 +95,65 @@ const Header = props => {
     });
   };
 
+  const _editProfile = () => {
+    Alert.alert(
+      'Edit Profile',
+      'Confirm to edit profile',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'Yes', onPress: () => editOke()},
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const editOke = () => {
+    if (image !== null && name !== '') {
+      let fd = new FormData();
+      fd.append('image', {
+        uri: image.uri,
+        name: image.fileName,
+        type: image.type,
+      });
+      dispatch(register(fd))
+        .then(res => {
+          // console.warn(res.value.data.result.image);
+          firebase
+            .database()
+            .ref('users/' + token)
+            .update({
+              avatar: res.value.data.result.image,
+              name: name.trim(),
+            })
+            .then(() => {
+              ToastAndroid.show('Edit profile sucess', ToastAndroid.SHORT);
+            });
+        })
+        .catch(err => {
+          ToastAndroid.show("Opps can't edit profile!", ToastAndroid.SHORT);
+        });
+    } else {
+      firebase
+        .database()
+        .ref('users/' + token)
+        .update({
+          name: name.trim(),
+        })
+        .then(() => {
+          ToastAndroid.show('Edit profile name sucess', ToastAndroid.SHORT);
+        });
+    }
+  };
+
+  const showModal = () => {
+    getProfile();
+    setImage(null);
+    setModal(true);
+  };
+
   return (
     <View style={styles.containerHeader}>
       <Icon
@@ -89,8 +163,8 @@ const Header = props => {
         size={25}
         style={styles.iconSend}
       />
-      <Text style={styles.title}>Haeu Chat</Text>
-      <TouchableOpacity onPress={() => setModal(true)}>
+      <Text style={styles.title}>Hayuu</Text>
+      <TouchableOpacity onPress={() => showModal()}>
         <Icon
           name="user"
           solid
@@ -110,11 +184,14 @@ const Header = props => {
         }}>
         <>
           <View style={styles.containerHeader}>
-            <Text style={styles.title}>Haeu Chat</Text>
+            <Text style={styles.title}>Profile</Text>
           </View>
           <View style={styles.container}>
             <View style={styles.boxProfile}>
-              <Image source={{uri: avatar}} style={styles.imgProfile} />
+              <Image
+                source={image === null ? {uri: avatar} : {uri: image.uri}}
+                style={styles.imgProfile}
+              />
               <TouchableOpacity onPress={showImage} style={styles.edit}>
                 <Icon name="edit" solid color="green" size={25} />
               </TouchableOpacity>
@@ -126,10 +203,19 @@ const Header = props => {
                 onChangeText={e => setName(e)}
                 value={name}
               />
+              <Text style={styles.username}>{data.key}</Text>
+              <Text style={styles.username}>{email}</Text>
             </View>
-            <TouchableOpacity style={styles.btn} onPress={_logout}>
-              <Text style={styles.btnText}>Logout</Text>
-            </TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity
+                style={[styles.btn, {backgroundColor: 'green'}]}
+                onPress={() => _editProfile()}>
+                <Text style={styles.btnText}>Edit Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btn} onPress={_logout}>
+                <Text style={styles.btnText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </>
       </Modal>
@@ -166,12 +252,12 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   textInput: {
-    borderBottomColor: '#acacac',
+    borderBottomColor: 'green',
     borderBottomWidth: 2,
     paddingHorizontal: 10,
     paddingTop: 5,
     paddingBottom: 1,
-    fontSize: 16,
+    fontSize: 20,
     marginTop: 20,
   },
   containerInput: {
@@ -180,11 +266,15 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 18,
-    color: 'green',
+    color: '#fff',
     fontWeight: 'bold',
   },
   btn: {
     marginTop: 30,
+    backgroundColor: 'salmon',
+    padding: 10,
+    borderRadius: 10,
+    marginLeft: 10,
   },
   boxProfile: {
     position: 'relative',
@@ -195,6 +285,10 @@ const styles = StyleSheet.create({
   },
   modal: {
     paddingVertical: 30,
+  },
+  username: {
+    marginTop: 10,
+    color: 'green',
   },
 });
 export default Header;

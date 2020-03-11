@@ -23,26 +23,31 @@ export const HeaderContact = props => {
   const [uid, setUid] = useState(token);
   const [avatar, setAvatar] = useState(null);
   const dispatch = useDispatch();
-
+  // console.warn(props.data);
   return (
     <View style={styles.containerHeader}>
-      <Icon
-        name="comments"
-        solid
-        color="#fff"
-        size={25}
-        style={styles.iconSend}
-      />
-      <Text style={styles.title}>Haeu Chat</Text>
-      <TouchableOpacity onPress={() => setModal(true)}>
-        <Icon
-          name="list"
-          solid
-          color="#fff"
-          size={25}
-          style={styles.iconSend}
-        />
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {props.avatar ? (
+          <Image style={styles.avatar} source={{uri: props.avatar}} />
+        ) : null}
+        <Text style={styles.title}>{props.title}</Text>
+      </View>
+      {props.data ? (
+        <TouchableOpacity onPress={() => props.profile(props.data)}>
+          <Icon
+            name="user"
+            solid
+            color="#fff"
+            size={25}
+            style={styles.iconSend}
+          />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
@@ -51,9 +56,10 @@ const styles = StyleSheet.create({
   containerHeader: {
     backgroundColor: '#00897b',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     color: '#fff',
@@ -105,5 +111,11 @@ const styles = StyleSheet.create({
   },
   modal: {
     paddingVertical: 30,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+    marginRight: 10,
   },
 });
