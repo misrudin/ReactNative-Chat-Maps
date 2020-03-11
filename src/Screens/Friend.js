@@ -130,8 +130,22 @@ const Friend = ({navigation}) => {
     navigation.navigate('ChatRoom', {uid});
     // console.warn(data);
   };
-  const confirm = () => {
-    alert('oke');
+  const confirm = data => {
+    // alert(data.uid);
+    firebase
+      .database()
+      .ref('friend/' + token)
+      .child(data.uid)
+      .update({
+        status: 2,
+      });
+    firebase
+      .database()
+      .ref('friend/' + data.uid)
+      .child(token)
+      .update({
+        status: 2,
+      });
   };
 
   const FriendList = ({data}) => {
@@ -151,7 +165,7 @@ const Friend = ({navigation}) => {
                 : 'Friend'}
             </Text>
             {data.status === 1 ? (
-              <TouchableOpacity onPress={() => confirm()}>
+              <TouchableOpacity onPress={() => confirm(data)}>
                 <Text style={styles.status}>Confirm</Text>
               </TouchableOpacity>
             ) : null}

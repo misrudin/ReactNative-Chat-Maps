@@ -20,7 +20,7 @@ const Home = props => {
   const {token} = useSelector(state => state.user);
   const [users, setUsers] = useState([]);
   const [uid, setUid] = useState(token);
-  const [keyid, setKeyId] = useState('');
+  const [keyid, setKeyId] = useState([]);
   const [isloading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,6 +53,7 @@ const Home = props => {
         let dbRef = firebase.database().ref('users/' + val.key);
         dbRef.on('value', val => {
           let person = val.val();
+          person.uid = val.key;
           setLoading(false);
           if (val.key !== uid) {
             data.push(person);
@@ -64,8 +65,9 @@ const Home = props => {
     setLoading(false);
   };
 
-  const showRoom = () => {
-    props.navigation.navigate('ChatRoom', {uid: keyid});
+  const showRoom = data => {
+    props.navigation.navigate('ChatRoom', {uid: data.uid});
+    // console.warn(data);
   };
 
   return (

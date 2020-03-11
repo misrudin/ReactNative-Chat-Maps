@@ -10,7 +10,7 @@ import {
 
 const ChatList = props => {
   const handlePres = () => {
-    props.onPress();
+    props.onPress(props.data);
   };
   const handleLongPress = () => {
     Alert.alert('long press');
@@ -19,7 +19,7 @@ const ChatList = props => {
     <>
       <TouchableOpacity
         activeOpacity={0.5}
-        onPress={handlePres}
+        onPress={() => handlePres(props.data)}
         onLongPress={() => handleLongPress()}>
         <View style={styles.content}>
           <View>
