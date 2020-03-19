@@ -17,9 +17,10 @@
 <b>Hayuu Chat</b> is a realtime chat application that can easily find out your friend's location through maps.
 
 ## Features
-* Users must sign in before play a game
-* Users can see leaderboard list player
-* Users can play game and get best score
+* Users must create account before use app
+* Next step Login and go to Home
+* Users can add friend and chat with friend
+* Users can find location friend
 * And others
 
 ## Requirements
