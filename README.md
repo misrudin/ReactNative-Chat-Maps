@@ -46,5 +46,5 @@
 </a>
 
 ## Related Project (Backend)
-* [`Backend-Hit-Hit-Baam`](https://github.com/misrudin/Hayuu-Chat-Backend.git)
+* [`Hayuu-Chat-Backend`](https://github.com/misrudin/Hayuu-Chat-Backend.git)
 
